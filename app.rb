@@ -9,7 +9,7 @@ require 'tilt'
 require 'sassc'
 
 # Server Settings
-set server 'thin', connections: []
+set :server, 'thin', connections: []
 set :bind, '0.0.0.0'
 set :port, '4567'
 
