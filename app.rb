@@ -16,3 +16,7 @@ set :port, '4567'
 get '/' do
   slim :index
 end
+
+get '/overlay' do
+  slim :overlay
+end
