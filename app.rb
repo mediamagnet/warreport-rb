@@ -20,3 +20,7 @@ end
 get '/overlay' do
   slim :overlay
 end
+
+get '/application.css' do
+  scss :application
+end

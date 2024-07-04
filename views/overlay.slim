@@ -1,7 +1,7 @@
-.container[style="height:100vh;text-align:center;"]
-  .columns.col-gapless[style="height:100vh;"]
-    .column.col-1[style="height:100vh;color:#FFFFFF;"]
-      .column.col-12[style="height:33vh;background-image:linear-gradient(red, black);z-index:0;"]
+.container
+  .columns.col-gapless
+    .column.col-1
+      .column.col-12.attacker.dosis-bold.centered
         | Attacker
         .column.col-12
           | James Workshop
@@ -9,23 +9,56 @@
           | Necrons
         .colum.col-12
           | Awakened Dynasty
-        .columns[style="text-align:center;z-index:0;margin:auto;"]
+        .columns.vpcp
           .column.col-6
             | VP
           .column.col-6
             | CP
-        .columns[style="text-align:center;z-index:0;margin:auto;"]
+        .columns.vpcp
           .column.col-6
             | 10
           .column.col-6
             | 02        
-        img[src="images/necrons.png" style="filter:invert(100%);filter:opacity(50%);z-index:1;position:0 0 0 0;width:100%"]
-      .column.col-12[style="height:33vh;background:black"]
+        img.faction[src="images/necrons.png"]
+      .column.col-12.camera
         | Camera
-      .column.col-12[style="height:33vh;background-image:linear-gradient(black, blue);"]
+      .column.col-12.defender.dosis-bold.centered
         | Defender
-    .column.col-11[style="height:100vh;"]
-      .column.col-12[style="height:90vh;"]
+        .column.col-12
+          | James Workshop
+        .column.col-12
+          | T'au Empire
+        .colum.col-12
+          | Kroot Hunting Pack
+        .columns.vpcp
+          .column.col-6
+            | VP
+          .column.col-6
+            | CP
+        .columns.vpcp
+          .column.col-6
+            | 10
+          .column.col-6
+            | 02
+          img.faction[src="images/tau.png"]
+    .column.col-11.main_area
+      .column.col-12.main_camera
         | Main Camera
-      .column.col-12[style="height:10vh;background:#c0c0c0"]
-        | Supporter Bar
+      .column.col-12.supporter
+        .columns.col-oneline
+          .column.col-1
+            .columns.col-oneline
+              .column.col-5.turn-status.centered
+                i.nf.nf-fa-arrow_up[style="color:white;"]
+              .column.col-5.turn-status.centered
+                i.nf.nf-fa-arrow_down[style="color:black;"]
+              .column.col-1.noleft
+                /! img.separator[src="images/arrow_right.svg"]
+                object[type="image/svg+xml" data="images/arrow_right.svg"]
+              .column.col-1.noleft
+                img.separator[src="images/arrow_right_thin.svg"]
+
+          .column.col-2.dosis-bold
+            | Turn 1
+          .column.col-9.dosis-bold
+            | Latest Twitch Notification Somehow:

@@ -1,3 +1,4 @@
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
 .saturate { filter: saturate(3); }
 .grayscale { filter: grayscale(100%); }
 .contrast { filter: contrast(160%); }
@@ -7,3 +8,119 @@
 .sepia { filter: sepia(100%); }
 .huerotate { filter: hue-rotate(180deg); }
 .rss.opacity { filter: opacity(50%); }
+
+body {
+    overflow-y: hidden;
+}
+
+.container {
+    height: 100vh;
+    padding-left: 0;
+    padding-right: 0;
+    background-color: #555555;
+}
+
+.noleft {
+    padding-left: 0;
+}
+
+.centered {
+    text-align: center;
+}
+
+.faction {
+    filter: invert(100%);
+    filter: opacity(50%);
+    z-index: 0;
+    position: 0 0 0 0;
+    width: 100%
+}
+
+.col-gapless {
+    height:100vh;
+}
+
+.col-1 {
+    height:100vh;
+    color:#FFFFFF;
+}
+
+.attacker {
+    height: 33vh;
+    background-image: linear-gradient(red, black);
+    z-index: 1;
+}
+
+.vpcp {
+    text-align: center;
+    z-index: 1;
+    margin: auto;
+}
+
+.camera {
+    height: 33vh;
+    background: black
+}
+
+.defender {
+    height: 33vh;
+    background-image: linear-gradient( black, blue );
+}
+
+.turn-status {
+    background:red;
+    height: 5vh;
+    padding: 0;
+}
+
+.defender-status {
+    background-image: linear-gradient( black, blue )
+}
+
+.main_area {
+    height: 100vh;
+}
+
+.main_camera {
+    height: 94vh;
+}
+
+.supporter {
+    height: 5vh;
+    line-height: 5vh;
+    background: #c0c0c0
+}
+
+.dosis-bold {
+	font-family: "Dosis", sans-serif;
+	font-optical-sizing: auto;
+	font-weight: 700;
+	font-style: normal;
+}
+
+.dosis-regular {
+	font-family: "Dosis", sans-serif;
+	font-optical-sizing: auto;
+	font-weight: 400;
+	font-style: normal;
+}
+
+.v-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+object {
+    color: blue;
+    height: 5vh;
+}
+
+.separator {
+    height: 5vh;
+    // filter: invert(10%) sepia(96%) saturate(6935%) hue-rotate(359deg) brightness(95%) contrast(113%);
+    color: red;
+    position: absolute;
+}
