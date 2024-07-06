@@ -21,6 +21,16 @@ get '/overlay' do
   slim :overlay
 end
 
+get '/players' do
+  slim :players
+end
+
 get '/application.css' do
   scss :application
 end
+
+get '/application.js' do
+  content_type 'text/javascript'
+  send_file File.join('views', 'application.js')
+end
+

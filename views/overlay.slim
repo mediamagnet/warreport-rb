@@ -15,8 +15,8 @@
           .column.col-6
             | CP
         .columns.vpcp
-          .column.col-6
-            | 10
+          #vp_atk.column.col-6
+            | 0
           .column.col-6
             | 02        
         img.faction[src="images/necrons.png"]
@@ -51,13 +51,17 @@
               .column.col-5.turn-status.centered
                 i.nf.nf-fa-arrow_up[style="color:white;"]
               .column.col-5.turn-status.centered
-                i.nf.nf-fa-arrow_down[style="color:black;"]
-              .column.col-1.noleft
-                /! img.separator[src="images/arrow_right.svg"]
-                object[type="image/svg+xml" data="images/arrow_right.svg"]
-              .column.col-1.noleft
-                img.separator[src="images/arrow_right_thin.svg"]
-
+                .columns
+                  .column.col-6
+                    i.nf.nf-fa-arrow_down[style="color:black;"]
+                  .column.col-6
+                    i.nf.nf-cod-triangle_right.separator
+              /! .column.col-1.noleft
+                /! img.separator[src="images/arrow_right.png" style="color:red;"]
+                i.nf.nf-cod-triangle_right.separator.noleft
+              /! .column.col-1.noleft
+                /! img.separator[src="images/arrow_right_thin.png"]
+                i.nf.nf-fa-chevron_right.separator.noleft
           .column.col-2.dosis-bold
             | Turn 1
           .column.col-9.dosis-bold

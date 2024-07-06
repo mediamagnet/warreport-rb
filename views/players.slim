@@ -1,0 +1,59 @@
+script src="application.js"
+.container.dosis-bold
+  .columns
+    .column.col-6.playeratk
+      .column.col-12
+        | Attacker
+      .columns.vpcp
+        .column.col-6
+          | VP
+        .column.col-6
+          | CP
+      .columns.vpcp
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle[onclick="increaseATKvp()"]
+            i.nf.nf-fa-arrow_up
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle
+            i.nf.nf-fa-arrow_up
+      .columns.vpcp
+        #vp_atk.column.col-6
+          | 0
+        .column.col-6
+          | 00
+      .columns.vpcp
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle
+            i.nf.nf-fa-arrow_down
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle
+            i.nf.nf-fa-arrow_down
+    .column.col-6.playerdef
+      .column.col-12
+        | defender
+      .columns.vpcp.col-oneline
+        .column.col-6
+          | VP
+        .column.col-6
+          | CP
+      .columns.vpcp
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle
+            i.nf.nf-fa-arrow_up
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle
+            i.nf.nf-fa-arrow_up
+      .columns.vpcp
+        .column.col-6
+          | 00
+        .column.col-6
+          | 00
+      .columns.vpcp
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle
+            i.nf.nf-fa-arrow_down
+        .column.col-6
+          button.btn.btn-lg.btn-primary.s-circle
+            i.nf.nf-fa-arrow_down
+    .column.col-12
+      | chat

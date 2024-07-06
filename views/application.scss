@@ -51,6 +51,20 @@ body {
     z-index: 1;
 }
 
+.playeratk {
+    height: 50vh;
+    background-image: linear-gradient(red, black);
+    z-index: 1;
+    font-size: 35pt;
+}
+
+.playerdef {
+    height: 50vh;
+    background-image: linear-gradient(blue, black);
+    z-index: 1;
+    font-size: 35pt;
+}
+
 .vpcp {
     text-align: center;
     z-index: 1;
@@ -96,6 +110,7 @@ body {
 	font-optical-sizing: auto;
 	font-weight: 700;
 	font-style: normal;
+    color: white;
 }
 
 .dosis-regular {
@@ -123,4 +138,7 @@ object {
     // filter: invert(10%) sepia(96%) saturate(6935%) hue-rotate(359deg) brightness(95%) contrast(113%);
     color: red;
     position: absolute;
+    font-size: 5vh;
+    float: left;
+    
 }
