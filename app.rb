@@ -7,17 +7,21 @@ require 'sinatra/js'
 require 'slim'
 require 'tilt'
 require 'sassc'
+require 'json'
 
 # Server Settings
 set :server, 'thin', connections: []
 set :bind, '0.0.0.0'
 set :port, '4567'
+set :public_folder, File.dirname(__FILE__) + '/public'
 
 get '/' do
   slim :index
 end
 
 get '/overlay' do
+  atkVPstr = params[:vpATK]
+  @atkVParray = JSON.parse(atkVPstr)
   slim :overlay
 end
 
