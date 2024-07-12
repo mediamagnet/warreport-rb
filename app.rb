@@ -29,6 +29,10 @@ get '/players' do
   slim :players
 end
 
+get '/admin' do
+  slim :admin
+end
+
 get '/application.css' do
   scss :application
 end
