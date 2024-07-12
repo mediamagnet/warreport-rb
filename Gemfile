@@ -21,3 +21,5 @@ group :production do
   gem 'puma'
   gem 'librato-rack'
 end
+
+gem "sinatra-websocket", "~> 0.3.1"

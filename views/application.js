@@ -10,15 +10,24 @@ document.addEventListener('DOMContentLoaded', function(){
  });
 
 function increaseATKvp() {
+    const ws = new WebSocket('ws://' + window.location.host + '/websocket');
     var score = parseInt(document.getElementById('vp_atk').innerHTML);
     document.getElementById('vp_atk').innerHTML = score+1;
-    var vpATK = [['attacker', score]]
-    JSON.stringify(score);
-    .get('/players', { vpATK: vpATK})
-    
+    ws.onmessage = function(event) {
+        console.log(event.data);
+    };
+    ws.send(score);
 }
 
 function decreaseATKvp() {
     var score = parseInt(document.getElementById('vp_atk').innerHTML);
     document.getElementById('vp_atk').innerHTML = score-1;
+}
+
+function updateATKOverlay() {
+    const ws = new WebSocket('ws://' + window.location.host + '/websocket');
+    ws.onmessage = function(event) {
+        const atkVPDiv = document.getElementById('vp_atk1');
+        atkVPDiv.innerHTML = event.data;
+    };
 }
