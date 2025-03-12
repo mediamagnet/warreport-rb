@@ -1,4 +1,3 @@
-@import "https://www.nerdfonts.com/assets/css/webfont.css";
 .saturate { filter: saturate(3); }
 .grayscale { filter: grayscale(100%); }
 .contrast { filter: contrast(160%); }
@@ -17,7 +16,6 @@ body {
     height: 100vh;
     padding-left: 0;
     padding-right: 0;
-    // background-color: #555555;
 }
 
 .noleft {
@@ -81,11 +79,48 @@ body {
     background-image: linear-gradient( black, blue );
 }
 
-.turn-status {
+.turn-atk{
     background:red;
     height: 5vh;
     padding: 0;
 }
+
+.turn-def{
+    background: blue;
+    height: 5vh;
+    padding: 0;
+}
+
+.btn-lg {
+    font-size: 36px; // Makes buttons larger
+    height: 120px; // Ensures better touch targets
+    width: 100%; // Ensures full column width
+  }
+  
+  .large-text {
+    font-size: 48px; // Increases size of numbers
+    font-weight: bold;
+  }
+  
+  .d-flex {
+    display: flex;
+  }
+  
+  .justify-center {
+    justify-content: center;
+  }
+  
+  .align-center {
+    align-items: center;
+  }
+  
+  .w-100 {
+    width: 100%;
+  }
+  
+  .h-100 {
+    height: 100%;
+  }
 
 .defender-status {
     background-image: linear-gradient( black, blue )
@@ -106,18 +141,18 @@ body {
 }
 
 .dosis-bold {
-	font-family: "Dosis", sans-serif;
-	font-optical-sizing: auto;
-	font-weight: 700;
-	font-style: normal;
+    font-family: "Dosis", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
     color: white;
 }
 
 .dosis-regular {
-	font-family: "Dosis", sans-serif;
-	font-optical-sizing: auto;
-	font-weight: 400;
-	font-style: normal;
+    font-family: "Dosis", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .v-center {
@@ -135,10 +170,26 @@ object {
 
 .separator {
     height: 5vh;
-    // filter: invert(10%) sepia(96%) saturate(6935%) hue-rotate(359deg) brightness(95%) contrast(113%);
     color: red;
     position: absolute;
     font-size: 5vh;
     float: left;
-    
 }
+
+.twitch-chat-container {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    height: 50vh; // Increase height so it doesn't get cut off
+    overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  
+  .twitch-chat {
+    width: 100%;
+    height: 100%;
+    border: none; // Removes iframe border
+  }
+  

@@ -1,46 +1,59 @@
-header.navbar
-  section.navbar-section
-    a.btn.btn-link[href="/overlay.html"]
-      | Overlay
-    a.btn.btn-link[href="/players"]
-      | Players
-  section.navbar-center
+h1.text-center.text-light Admin Panel
 
-.container
+javascript:
+  window.addEventListener("load", function () {
+    document.getElementById("admin-form").reset(); // Forces form fields to reset on page load
+  });
+
+form#admin-form
   .columns
     .column.col-6
-      .form-group
-        .has-icon-left
-          input#attacker-name.form-input[type="text" placeholder="Attacker Name"]
-          i.form-icon.nf.nf-md-sword_cross
-      .form-group
-        .has-icon-left
-          input#attacker-faction.form-input[type="text" placeholder="Attacker Faction"]
-          i.form-icon.nf.nf-fa-flag
-      .form-group
-        .has-icon-left
-          input#attacker-detach.form-input[type="text" placeholder="Attacker Detachment"]
-          i.form-icon.nf.nf-fa-rectangle_list
-      .form-group
-        label.form-switch
-          input[type="checkbox"]
-          i.form-icon
-          | Painted 
-    .colum.col-6 
-      .form-group
-        .has-icon-left
-          input#attacker-name.form-input[type="text" placeholder="Defender Name"]
-          i.form-icon.nf.nf-fa-shield
-      .form-group
-        .has-icon-left
-          input#attacker-faction.form-input[type="text" placeholder="Defender Faction"]
-          i.form-icon.nf.nf-fa-flag
-      .form-group
-        .has-icon-left
-          input#attacker-detach.form-input[type="text" placeholder="Defender Detachment"]
-          i.form-icon.nf.nf-fa-rectangle_list
-      .form-group
-        label.form-switch
-          input[type="checkbox"]
-          i.form-icon
-          | Painted
+      h2 Player 1
+      label Name:
+      input type="text" name="player1_name" value=game_state[:player1][:name] autocomplete="off"
+      
+      label Role:
+      select name="player1_role"
+        option value="Attacker" selected=(game_state[:player1][:role] == "Attacker") Attacker
+        option value="Defender" selected=(game_state[:player1][:role] == "Defender") Defender
+      
+      label Army:
+      select name="player1_army"
+        - FACTIONS.each do |category, factions|
+          optgroup label=category
+            - factions.each do |faction|
+              option value=faction selected=(game_state[:player1][:army] == faction) = faction
+      
+      label Detachment:
+      input type="text" name="player1_detachment" value=game_state[:player1][:detachment] autocomplete="off"
+
+    .column.col-6
+      h2 Player 2
+      label Name:
+      input type="text" name="player2_name" value=game_state[:player2][:name] autocomplete="off"
+      
+      label Role:
+      select name="player2_role"
+        option value="Attacker" selected=(game_state[:player2][:role] == "Attacker") Attacker
+        option value="Defender" selected=(game_state[:player2][:role] == "Defender") Defender
+      
+      label Army:
+      select name="player2_army"
+        - FACTIONS.each do |category, factions|
+          optgroup label=category
+            - factions.each do |faction|
+              option value=faction selected=(game_state[:player2][:army] == faction) = faction
+      
+      label Detachment:
+      input type="text" name="player2_detachment" value=game_state[:player2][:detachment] autocomplete="off"
+
+.text-center.mt-4
+  button.btn.btn-danger#end-game End Game
+  button.btn.btn-warning#reset-game onclick="resetGame()" Reset Game
+
+// Twitch Chat Section (JChat Embed)
+.column.col-12.twitch-chat-container
+  h2.text-center.text-light Twitch Chat
+  iframe#twitch-chatbox.twitch-chat[
+    src="https://www.giambaj.it/twitch/jchat/v2/?channel=your_twitch_channel&size=3&font=5&animate=true&bots=true"
+    style="height: 100%; width: 100%;"]

@@ -1,25 +1,15 @@
-ruby '3.3.3'
-source 'https://rubygems.org'
+# frozen_string_literal: true
 
-gem 'oj'
+source "https://rubygems.org"
 
-gem 'datamapper'
-gem 'sassc'
-gem 'sinatra'
-gem 'sinatra-js'
-gem 'slim'
-gem 'tilt'
-gem 'thin'
-gem 'token_phrase'
+# gem "rails"
 
-group :development do
-  gem 'sinatra-reloader'
-  gem 'pry'
-end
+gem "sinatra", "~> 4.1"
+gem "sinatra-reloader", "~> 1.0"
+gem "slim", "~> 5.2"
+gem "puma", "~> 6.6"
+gem "rack", "~> 3.1"
 
-group :production do
-  gem 'puma'
-  gem 'librato-rack'
-end
+gem "rackup", "~> 2.2"
 
-gem "sinatra-websocket", "~> 0.3.1"
+gem "sassc", "~> 2.4"

@@ -1,0 +1,102 @@
+h1.text-center.text-light Player Panel
+
+- if game_state[:turn] > 5
+  .column.col-12.game-over.text-center
+    h1.text-light Game Over
+    h2.text-light Winner:
+    h1.text-light.large
+      - if game_state[:winner]
+        = game_state[:winner]
+      - else
+        | Draw
+- else
+  .columns
+    .column.col-6[style="background: #{game_state[:player1][:role] == 'Attacker' ? 'red' : 'blue'}; padding: 20px;"]
+      h2.text-center.text-light = game_state[:player1][:name]
+      h3.text-center.text-light = game_state[:player1][:role]
+      h4.text-center.text-light = "#{game_state[:player1][:army]} - #{game_state[:player1][:detachment]}"
+
+      .text-center.text-light Primary VP | Secondary VP
+      
+      .columns.text-center
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 1" data-field="primary" data-value="1"
+            i data-feather="arrow-up"
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 1" data-field="secondary" data-value="1"
+            i data-feather="arrow-up"
+      
+      .columns.text-center
+        .column.col-6.text-light.large-text.d-flex.justify-center.align-center
+          span = game_state[:player1][:primary]
+        .column.col-6.text-light.large-text.d-flex.justify-center.align-center
+          span = game_state[:player1][:secondary]
+
+      .columns.text-center
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 1" data-field="primary" data-value="-1"
+            i data-feather="arrow-down"
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 1" data-field="secondary" data-value="-1"
+            i data-feather="arrow-down"
+
+      .text-center.text-light + CP -
+      .columns.text-center
+        .column.col-4.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 1" data-field="cp" data-value="1"
+            i data-feather="plus"
+        .column.col-4.text-light.large-text.d-flex.justify-center.align-center
+          span = game_state[:player1][:cp]
+        .column.col-4.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 1" data-field="cp" data-value="-1"
+            i data-feather="minus"
+
+    .column.col-6[style="background: #{game_state[:player2][:role] == 'Attacker' ? 'red' : 'blue'}; padding: 20px;"]
+      h2.text-center.text-light = game_state[:player2][:name]
+      h3.text-center.text-light = game_state[:player2][:role]
+      h4.text-center.text-light = "#{game_state[:player2][:army]} - #{game_state[:player2][:detachment]}"
+
+      .text-center.text-light Primary VP | Secondary VP
+
+      .columns.text-center
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 2" data-field="primary" data-value="1"
+            i data-feather="arrow-up"
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 2" data-field="secondary" data-value="1"
+            i data-feather="arrow-up"
+
+      .columns.text-center
+        .column.col-6.text-light.large-text.d-flex.justify-center.align-center
+          span = game_state[:player2][:primary]
+        .column.col-6.text-light.large-text.d-flex.justify-center.align-center
+          span = game_state[:player2][:secondary]
+
+      .columns.text-center
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 2" data-field="primary" data-value="-1"
+            i data-feather="arrow-down"
+        .column.col-6.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 2" data-field="secondary" data-value="-1"
+            i data-feather="arrow-down"
+
+      .text-center.text-light + CP -
+      .columns.text-center
+        .column.col-4.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 2" data-field="cp" data-value="1"
+            i data-feather="plus"
+        .column.col-4.text-light.large-text.d-flex.justify-center.align-center
+          span = game_state[:player2][:cp]
+        .column.col-4.d-flex.justify-center.align-center
+          button.btn.btn-lg.btn-primary.w-100.h-100 data-update-score=true data-player="Player 2" data-field="cp" data-value="-1"
+            i data-feather="minus"
+
+  .text-center.mt-4
+    button.btn.btn-success.btn-lg#next-turn Next Turn
+
+// Twitch Chat Section (JChat Embed)
+.column.col-12.twitch-chat-container
+  h2.text-center.text-light Twitch Chat
+  iframe#twitch-chatbox.twitch-chat[
+    src="https://www.giambaj.it/twitch/jchat/v2/?channel=your_twitch_channel&size=3&font=5&animate=true&bots=true"
+    style="height: 100%; width: 100%;"]
