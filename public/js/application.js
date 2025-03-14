@@ -1,6 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
     const resetButton = document.getElementById("reset-game");
     const nextTurnButton = document.getElementById("next-turn");
+    const adminInputs = document.querySelectorAll(".admin-input");
+    
+    // fetchGameState();
+    fetch("/secondary_missions.json")
+    .then(response => response.json())
+    .then(data => {
+        populateMissionDropdowns(data.cards);
+    })
+    .catch(error => console.error("Error loading mission data:", error));
 
     if (resetButton) {
         resetButton.addEventListener("click", resetGame);
@@ -13,28 +22,126 @@ document.addEventListener("DOMContentLoaded", function () {
             updateScore(player, field, value);
         });
     });
-    document.querySelectorAll("#admin-form input, #admin-form select").forEach(element => {
-        element.addEventListener("change", function () {
-            const player = this.name.includes("player1") ? "Player 1" : "Player 2";
-            const field = this.name.replace(/^player1_|^player2_/, ""); // Extracts field name
-            updateGameState(player, field, this.value);
+    
+    adminInputs.forEach(input => {
+        input.addEventListener("change", function () {
+            updateAdminField(this.dataset.player, this.dataset.field, this.value);
         });
     });
 
     if (nextTurnButton) {
         nextTurnButton.addEventListener("click", passTurn);
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("[data-draw-missions]").forEach(button => {
+            button.addEventListener("click", function () {
+                const player = this.getAttribute("data-player");
+                drawMissions(player);
+            });
+        });
+    
+        document.querySelectorAll("[data-discard-mission]").forEach(button => {
+            button.addEventListener("click", function () {
+                const missionSlot = this.closest(".mission-card").getAttribute("data-slot");
+                const player = this.closest(".mission-card").getAttribute("data-player");
+                discardMission(player, missionSlot);
+            });
+        });
+    });
 });
 
-function resetGame() {
-    if (confirm("Are you sure you want to reset the game?")) {
-        fetch("/reset_game", { method: "POST" })
-            .then(() => {
-                window.location.replace("/admin"); // Forces a full reload without parameters
-            })
-            .catch(() => alert("Error resetting game."));
-    }
+function drawMissions(player) {
+    fetch("/draw_missions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ player: player })
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateMissionDisplay(player, data.missions);
+    })
+    .catch(error => console.error("Error drawing missions:", error));
 }
+
+function updateMissionDisplay(player, missions) {
+    missions.forEach((mission, index) => {
+        let missionCard = document.querySelector(`[data-player="${player}"][data-slot="${index + 1}"]`);
+        if (missionCard) {
+            missionCard.querySelector(".mission-title").textContent = mission.name;
+            missionCard.querySelector(".mission-description").textContent = mission.description;
+        }
+    });
+}
+
+function discardMission(player, slot) {
+    fetch("/discard_mission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ player: player, slot: slot })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateMissionDisplay(player, data.missions);
+        }
+    })
+    .catch(error => console.error("Error discarding mission:", error));
+}
+
+function updateMission(select) {
+    const player = select.dataset.player;
+    const missionKey = select.dataset.mission;
+    const missionName = select.value;
+
+    fetch("/secondary_missions.json")
+        .then(response => response.json())
+        .then(data => {
+            const missionDescription = data.cards[missionName] || "No description available.";
+            document.getElementById(`${player.toLowerCase()}_mission_description`).textContent = missionDescription;
+
+            fetch("/update_mission", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ player, missionKey, missionName })
+            });
+        });
+}
+
+function resetGame() {
+    fetch('/reset_game', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("Game successfully reset.");
+
+                // Hide modal & reset dismissal flag
+                const modal = document.getElementById("game-over-modal");
+                if (modal) {
+                    modal.classList.add("hidden");
+                }
+                modalDismissed = false; // Allow modal to be shown again
+
+                // Reload the page to reflect reset state
+                location.reload();
+            }
+        })
+        .catch(error => console.error("Error resetting game:", error));
+}
+
+// Fetch game state and update UI, but only show modal if it hasn’t been dismissed
+// function fetchGameState() {
+//    fetch("/game_state.json")
+//        .then(response => response.json())
+//        .then(data => {
+//            const winnerText = document.querySelector(".winner-announcement h1");
+//
+//            if (data.winner && winnerText) {
+//                winnerText.innerText = `${data.winner} Wins!`;
+//            }
+//        })
+//        .catch(error => console.error("Error fetching game state:", error));
+// }
 
 function updateGameState(player, field, value) {
     fetch("/update_game_state", {
@@ -66,7 +173,19 @@ function passTurn() {
         .catch(() => alert("Error advancing turn."));
 }
 
-
+function updateAdminField(player, field, value) {
+    fetch("/update_admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            player: player,
+            [field]: value
+        })
+    })
+    .then(response => response.json())
+    .then(data => console.log("Updated game state:", data))
+    .catch(error => console.error("Error updating game state:", error));
+}
 
 function updateCP(gameState) {
     document.querySelector("[data-player='Player 1'][data-field='cp']").innerText = gameState.player1.cp;
@@ -122,4 +241,37 @@ function updateScore(player, field, value) {
         }
     })
     .catch(error => console.error('Error updating score:', error));
+}
+
+function populateMissionDropdowns(missions) {
+    const dropdowns = ["player1_mission1", "player1_mission2", "player2_mission1", "player2_mission2"];
+    dropdowns.forEach(dropdownId => {
+        const dropdown = document.getElementById(dropdownId);
+        dropdown.innerHTML = '<option value="">Select a Mission</option>'; // Default option
+        Object.keys(missions).forEach(mission => {
+            let option = document.createElement("option");
+            option.value = mission;
+            option.textContent = mission;
+            dropdown.appendChild(option);
+        });
+    });
+}
+
+function updateMission(select) {
+    const player = select.dataset.player;
+    const missionKey = select.dataset.mission;
+    const missionName = select.value;
+
+    fetch("/secondary_missions.json")
+        .then(response => response.json())
+        .then(data => {
+            const missionDescription = data.cards[missionName] || "No description available.";
+            document.getElementById(`${player.toLowerCase()}_mission_description`).textContent = missionDescription;
+
+            fetch("/update_mission", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ player, missionKey, missionName })
+            });
+        });
 }

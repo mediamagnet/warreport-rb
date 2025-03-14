@@ -101,7 +101,15 @@ body {
     font-size: 48px; // Increases size of numbers
     font-weight: bold;
   }
-  
+
+  .mid-text {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
   .d-flex {
     display: flex;
   }
@@ -176,20 +184,93 @@ object {
     float: left;
 }
 
-.twitch-chat-container {
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 15px;
-    height: 50vh; // Increase height so it doesn't get cut off
-    overflow: hidden;
-    border-radius: 10px;
+.player-panel {
+    height: 100vh;
+    padding: 20px;
+    color: white;
+}
+
+.attacker-panel {
+    background: linear-gradient(180deg, red, black);
+}
+
+.defender-panel {
+    background: linear-gradient(180deg, blue, black);
+}
+
+/* Center text in all columns */
+.columns.text-center {
+    text-align: center;
+}
+
+/* Button styling */
+button {
+    border: none;
+    cursor: pointer;
+}
+
+/* Ensure button layout looks good */
+.columns.text-center .column {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-  }
-  
-  .twitch-chat {
+    justify-content: center;
+}
+
+/* Styling for CP section */
+.cp-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-panel {
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden; // Prevents any overflow from background images
+    z-index: 1; // Keeps text and buttons above the background
+}
+
+.player-panel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    border: none; // Removes iframe border
-  }
-  
+    opacity: 0.5; // Makes faction logo semi-transparent
+    z-index: 0; // Places background behind the content
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+// Ensure all child elements stay above the background
+.player-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+.player1-panel {
+    background: linear-gradient(to bottom, red, black);
+}
+
+.player2-panel {
+    background: linear-gradient(to bottom, blue, black);
+}
+
+.player1-panel::before, .player2-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.3; // Adjust for visibility
+}
+
+
+

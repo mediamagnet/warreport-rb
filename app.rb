@@ -5,31 +5,33 @@ require 'sinatra/reloader' if development?
 require 'fileutils'
 
 STATE_FILE = 'game_state.json'
+SECONDARY_FILE = 'secondary_missions.json'
+
 FACTIONS = {
   "Imperium" => [
     "Adepta Sororitas", "Adeptus Custodes", "Adeptus Mechanicus", "Adeptus Titanicus",
-    "Astra Militarum", "Grey Knights", "Imperial Agents", "Imperial Knights", "Space Marines"
+    "Astra Militarum", "Grey Knights", "Imperial Agents", "Imperial Knights", "Adeptus Astartes"
   ],
   "Chaos" => [
     "Chaos Daemons", "Chaos Knights", "Chaos Space Marines", "Death Guard", "Thousand Sons", "World Eaters"
   ],
   "Xenos" => [
-    "Aeldari", "Drukhari", "Genestealer Cults", "Leagues of Votann", "Necrons", "Orks", "T\'au Empire", "Tyranids"
+    "Aeldari", "Drukhari", "Genestealer Cults", "Leagues of Votann", "Necrons", "Orks", "T'au Empire", "Tyranids"
   ],
   "Unaligned" => ["Unaligned Forces"]
 }
 
-
-# Initialize game state file if not present
+# Load game state or initialize it
 def load_game_state
   if File.exist?(STATE_FILE)
     JSON.parse(File.read(STATE_FILE), symbolize_names: true)
   else
     default_state = {
-      player1: { name: 'Player 1', cp: 0, primary: 0, secondary: 0, role: 'Attacker', army: '', detachment: '' },
-      player2: { name: 'Player 2', cp: 0, primary: 0, secondary: 0, role: 'Defender', army: '', detachment: '' },
+      player1: { name: 'Player 1', cp: 1, primary: 0, secondary: 0, role: 'Attacker', army: '', detachment: '' },
+      player2: { name: 'Player 2', cp: 1, primary: 0, secondary: 0, role: 'Defender', army: '', detachment: '' },
       turn: 1,
-      phase: 'Top'
+      phase: 'Top',
+      winner: nil
     }
     File.write(STATE_FILE, JSON.pretty_generate(default_state))
     default_state
@@ -40,24 +42,17 @@ def save_game_state(state)
   File.write(STATE_FILE, JSON.pretty_generate(state))
 end
 
-game_state = load_game_state
-
-# Home - Scoreboard UI
+# Routes
 get '/' do
-  game_state = load_game_state
-  slim :index, locals: { game_state: game_state }
+  slim :index, locals: { game_state: load_game_state }
 end
 
-# Player Input Page
 get '/player' do
-  game_state = load_game_state
-  slim :player, locals: { game_state: game_state }
+  slim :player, locals: { game_state: load_game_state }
 end
 
-# Admin Panel
 get '/admin' do
-  game_state = load_game_state
-  slim :admin, locals: { game_state: game_state, factions: FACTIONS }
+  slim :admin, locals: { game_state: load_game_state, factions: FACTIONS }
 end
 
 post '/reset_game' do
@@ -68,17 +63,9 @@ post '/reset_game' do
     phase: 'Top',
     winner: nil
   }
-  
-  # Completely overwrite the JSON file with default state
-  File.write(STATE_FILE, JSON.pretty_generate(default_state))
-
-  # Force browser to NOT cache the response & clean redirect
-  headers 'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-          'Expires' => '0',
-          'Pragma' => 'no-cache'
-
-  # Redirect to /admin cleanly without query parameters
-  redirect '/admin', 303
+  save_game_state(default_state)
+  content_type :json
+  { success: true }.to_json
 end
 
 post '/pass_turn' do
@@ -92,50 +79,62 @@ post '/pass_turn' do
       game_state[:turn] += 1
     end
 
-    # Increase CP for both players at the start of each new player's turn
-    game_state[:player1][:cp] += 1
-    game_state[:player2][:cp] += 1
-  end
-
-  # If turn > 5, determine the winner
-  if game_state[:turn] > 5
-    player1_total = game_state[:player1][:primary] + game_state[:player1][:secondary]
-    player2_total = game_state[:player2][:primary] + game_state[:player2][:secondary]
-
-    if player1_total > player2_total
-      game_state[:winner] = game_state[:player1][:name]
-    elsif player2_total > player1_total
-      game_state[:winner] = game_state[:player2][:name]
-    else
-      game_state[:winner] = "Draw"
+    # Increase CP for both players *ONLY* if the game isn't over
+    if game_state[:turn] <= 5
+      game_state[:player1][:cp] += 1
+      game_state[:player2][:cp] += 1
     end
   end
 
-  # **Force Save to Ensure Overlay Updates**
-  File.write(STATE_FILE, JSON.pretty_generate(game_state))
+  # Determine winner only if game is over
+  if game_state[:turn] > 5 && !game_state[:winner]
+    p1_total = game_state[:player1][:primary] + game_state[:player1][:secondary]
+    p2_total = game_state[:player2][:primary] + game_state[:player2][:secondary]
 
+    game_state[:winner] = if p1_total > p2_total
+                            game_state[:player1][:name]
+                          elsif p2_total > p1_total
+                            game_state[:player2][:name]
+                          else
+                            "Draw"
+                          end
+  end
+
+  save_game_state(game_state)
   content_type :json
   { success: true, game_state: game_state }.to_json
 end
 
+get '/game_state.json' do
+  content_type :json
+  if File.exist?(STATE_FILE) && !File.zero?(STATE_FILE)
+    File.read(STATE_FILE)
+  else
+    status 500
+    { error: "Invalid game state" }.to_json
+  end
+end
 
-post '/end_game' do
+get '/secondary_missions.json' do
+  content_type :json
+  if File.exist?(SECONDARY_FILE) && !File.zero?(SECONDARY_FILE)
+    File.read(SECONDARY_FILE)
+  else
+    status 500
+    { error: "Missing Secondaries" }.to_json
+  end
+end
+
+post '/update_score' do
   game_state = load_game_state
+  data = JSON.parse(request.body.read) rescue {}
 
-  # Prevent recalculating if the game is already ended
-  unless game_state.key?(:winner)
-    p1_total_vp = game_state[:player1][:primary] + game_state[:player1][:secondary]
-    p2_total_vp = game_state[:player2][:primary] + game_state[:player2][:secondary]
+  player_key = data['player'] == 'Player 1' ? :player1 : :player2
+  field = data['field'].to_sym
+  value = data['value'].to_i
 
-    if p1_total_vp > p2_total_vp
-      game_state[:winner] = game_state[:player1][:name]
-    elsif p2_total_vp > p1_total_vp
-      game_state[:winner] = game_state[:player2][:name]
-    else
-      game_state[:winner] = "Draw"
-    end
-
-    game_state[:game_over] = true  # Set game state to indicate the game has ended
+  if game_state[player_key].key?(field)
+    game_state[player_key][field] += value
     save_game_state(game_state)
   end
 
@@ -143,98 +142,87 @@ post '/end_game' do
   { success: true, game_state: game_state }.to_json
 end
 
-# Overlay Route for Streaming (Live Updates via Meta Refresh)
-get '/overlay' do
-  game_state = load_game_state
-  slim :overlay, locals: { game_state: game_state }
-end
-
-# API to update admin details in real-time
 post '/update_admin' do
   game_state = load_game_state
-  request.body.rewind
   data = JSON.parse(request.body.read) rescue {}
-  if data['player'] == 'Player 1'
-    game_state[:player1][:name] = data['name'].to_s unless data['name'].nil?
-    game_state[:player1][:role] = data['role'].to_s unless data['role'].nil?
-    game_state[:player1][:army] = data['army'].to_s unless data['army'].nil?
-    game_state[:player1][:detachment] = data['detachment'].to_s unless data['detachment'].nil?
-  elsif data['player'] == 'Player 2'
-    game_state[:player2][:name] = data['name'].to_s unless data['name'].nil?
-    game_state[:player2][:role] = data['role'].to_s unless data['role'].nil?
-    game_state[:player2][:army] = data['army'].to_s unless data['army'].nil?
-    game_state[:player2][:detachment] = data['detachment'].to_s unless data['detachment'].nil?
-  end
+
+  player_key = data["player"] == "Player 1" ? :player1 : :player2
+  game_state[player_key][:name] = data["name"] if data["name"]
+  game_state[player_key][:role] = data["role"] if data["role"]
+  game_state[player_key][:army] = data["army"] if data["army"]
+  game_state[player_key][:detachment] = data["detachment"] if data["detachment"]
+
   save_game_state(game_state)
   content_type :json
   { success: true, game_state: game_state }.to_json
 end
 
-post '/update_score' do
-    game_state = load_game_state
-    request.body.rewind
-    data = JSON.parse(request.body.read) rescue {}
-  
-    player_key = data['player'] == 'Player 1' ? :player1 : :player2
-    field = data['field'].to_sym
-    value = data['value'].to_i
-  
-    if game_state[player_key].key?(field)
-      game_state[player_key][field] += value
-      save_game_state(game_state)
-    end
-  
-    content_type :json
-    { success: true, game_state: game_state }.to_json
-end
-
-post '/update_factions' do
+post '/end_game' do
   game_state = load_game_state
 
-  request.body.rewind
-  data = JSON.parse(request.body.read) rescue {}
+  if !game_state[:winner]
+    p1_total_vp = game_state[:player1][:primary] + game_state[:player1][:secondary]
+    p2_total_vp = game_state[:player2][:primary] + game_state[:player2][:secondary]
 
-  game_state[:player1][:army] = data['player1_faction'] unless data['player1_faction'].nil?
-  game_state[:player2][:army] = data['player2_faction'] unless data['player2_faction'].nil?
+    game_state[:winner] = if p1_total_vp > p2_total_vp
+                            game_state[:player1][:name]
+                          elsif p2_total_vp > p1_total_vp
+                            game_state[:player2][:name]
+                          else
+                            "Draw"
+                          end
 
-  save_game_state(game_state)
-
-  content_type :json
-  { success: true, game_state: game_state }.to_json
-end
-
-post '/update_game_state' do
-  game_state = load_game_state
-  request.body.rewind
-  data = JSON.parse(request.body.read) rescue {}
-
-  if data['player'] == 'Player 1'
-    game_state[:player1][:name] = data['name'] if data.key?('name')
-    game_state[:player1][:role] = data['role'] if data.key?('role')
-    game_state[:player1][:army] = data['army'] if data.key?('army')
-    game_state[:player1][:detachment] = data['detachment'] if data.key?('detachment')
-  elsif data['player'] == 'Player 2'
-    game_state[:player2][:name] = data['name'] if data.key?('name')
-    game_state[:player2][:role] = data['role'] if data.key?('role')
-    game_state[:player2][:army] = data['army'] if data.key?('army')
-    game_state[:player2][:detachment] = data['detachment'] if data.key?('detachment')
+    game_state[:game_over] = true
+    save_game_state(game_state)
   end
 
-  # Save updates to game_state.json
-  save_game_state(game_state)
-
   content_type :json
   { success: true, game_state: game_state }.to_json
 end
 
+post '/draw_missions' do
+  game_state = load_game_state
+  request.body.rewind
+  data = JSON.parse(request.body.read)
+  player_key = data["player"].downcase.to_sym
+
+  missions = JSON.parse(File.read("secondary_missions.json"))["cards"]
+  selected_missions = missions.keys.sample(2)
+
+  game_state[player_key][:missions] = selected_missions
+
+  save_game_state(game_state)
+
+  content_type :json
+  { success: true, missions: selected_missions.map { |m| { name: m, description: missions[m] } } }.to_json
+end
+
+post '/discard_mission' do
+  game_state = load_game_state
+  request.body.rewind
+  data = JSON.parse(request.body.read)
+  player_key = data["player"].downcase.to_sym
+  slot = data["slot"].to_i - 1
+
+  missions = JSON.parse(File.read("secondary_missions.json"))["cards"]
+  new_mission = (missions.keys - game_state[player_key][:missions]).sample
+
+  game_state[player_key][:missions][slot] = new_mission
+
+  save_game_state(game_state)
+
+  content_type :json
+  { success: true, missions: game_state[player_key][:missions].map { |m| { name: m, description: missions[m] } } }.to_json
+end
+
+get '/overlay' do
+  slim :overlay, locals: { game_state: load_game_state }
+end
 
 get '/application.css' do
-    scss :application
+  scss :application
 end
 
-# Start Sinatra server
 set :bind, '0.0.0.0'
 set :port, 4567
-
-# Use external Slim templates
 set :views, File.dirname(__FILE__) + '/views'

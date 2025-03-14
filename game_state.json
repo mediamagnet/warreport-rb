@@ -1,23 +1,23 @@
 {
   "player1": {
-    "name": "John Warhammer",
-    "cp": 5,
-    "primary": 4,
-    "secondary": 1,
+    "name": "Player 1",
+    "cp": 1,
+    "primary": 1,
+    "secondary": 0,
     "role": "Attacker",
-    "army": "Necrons",
-    "detachment": "Hypercrypt Legion"
+    "army": "Adeptus Custodes",
+    "detachment": "a"
   },
   "player2": {
-    "name": "John Helldiver",
-    "cp": 5,
+    "name": "Player 2",
+    "cp": 1,
     "primary": 0,
     "secondary": 0,
     "role": "Defender",
-    "army": "T'au Empire",
-    "detachment": "Retaliation Cadre"
+    "army": "Adepta Sororitas",
+    "detachment": "a"
   },
-  "turn": 5,
+  "turn": 1,
   "phase": "Top",
-  "winner": "John Warhammer"
+  "winner": null
 }

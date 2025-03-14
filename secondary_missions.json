@@ -1,0 +1,83 @@
+{
+    "ASSASSINATION": {
+        "description": "The enemy look to their champions for courage. Identify and eliminate them with extreme prejudice.",
+        "victory_conditions": {
+            "Fixed": "Each time an enemy CHARACTER model is destroyed.",
+            "Tactical": "One or more enemy CHARACTER models were destroyed this turn, OR all CHARACTER models from your opponent\u2019s army have been destroyed."
+        },
+        "points": {
+            "Fixed": 4,
+            "Tactical": 5
+        }
+    },
+    "BEHIND ENEMY LINES": {
+        "description": "Break through the foe\u2019s army and cut off their lines of escape.",
+        "when_drawn": "If it is the first battle round, you can draw a new Secondary Mission card and shuffle this card back into your Secondary Mission deck.",
+        "victory_conditions": {
+            "End of Turn": "One unit from your army (excluding AIRCRAFT and Battle-shocked units) is wholly within your opponent\u2019s deployment zone, OR two or more units are wholly within your opponent\u2019s deployment zone."
+        },
+        "points": {
+            "One Unit": 3,
+            "Two or More Units": 4
+        }
+    },
+    "BRING IT DOWN": {
+        "description": "The opposing army contains numerous heavily armoured units. Take any opportunity to bring them down.",
+        "when_drawn": "If there are no enemy MONSTER or VEHICLE units on the battlefield, you can discard this card and draw a new Secondary Mission card.",
+        "victory_conditions": {
+            "While Active": "Each time an enemy MONSTER or VEHICLE unit is destroyed."
+        },
+        "points": {
+            "Base": 2,
+            "15+ Wounds": 4,
+            "20+ Wounds": 6
+        }
+    },
+    "STORM HOSTILE OBJECTIVE": {
+        "description": "Dominate the field of battle. Storm every site of tactical import and leave the foe with no place to hide.",
+        "when_drawn": "If it is the first battle round, you can draw a new Secondary Mission card and shuffle this card back into your Secondary Mission deck.",
+        "victory_conditions": {
+            "End of Turn": "You control one or more objective markers that were controlled by your opponent at the start of the turn, OR (from second battle round onwards) your opponent controlled no objectives and you control one or more new ones."
+        },
+        "points": 4
+    },
+    "CULL THE HORDE": {
+        "description": "The enemy come forth in teeming masses. Their ranks must be thinned if the day is to be won.",
+        "when_drawn": "If there are no enemy units on the battlefield that satisfy the conditions, you can discard this card and draw a new one.",
+        "victory_conditions": {
+            "While Active": "Each time an enemy INFANTRY unit is destroyed under the following conditions:\n- Starting Strength of 20+\n- Total Wounds 25+ at Starting Strength\n- Originally cost points for 20+ models"
+        },
+        "points": 5
+    },
+    "RECOVER ASSETS": {
+        "description": "Scattered strategic assets must be swiftly reclaimed.",
+        "when_drawn": "If there are fewer than two units from your army on the battlefield, you can discard this card and draw a new one.",
+        "action": "RECOVER ASSETS (Action)",
+        "starts": "Your Shooting phase.",
+        "completes": "End of your opponent\u2019s next turn or the end of the battle, if two or three of those units are still on the battlefield.",
+        "points": {
+            "Two Units": 3,
+            "Three Units": 6
+        }
+    },
+    "AREA DENIAL": {
+        "description": "It is critical that this area is dominated. No enemy vanguard or guerrilla units can be allowed to disrupt our plans.",
+        "victory_conditions": {
+            "End of Turn": "One or more units from your army (excluding AIRCRAFT and Battle-shocked units) are within 3\" of the battlefield center, and no enemy units are within 3\" (2VP), OR no enemy units are within 6\" (5VP)."
+        },
+        "points": {
+            "3\" Clear": 2,
+            "6\" Clear": 5
+        }
+    },
+    "SECURE NO MAN'S LAND": {
+        "description": "You must advance swiftly into no man\u2019s land and seize it before the enemy can.",
+        "victory_conditions": {
+            "End of Turn": "You control one objective marker in No Man\u2019s Land (2VP), OR you control two or more objective markers in No Man\u2019s Land (5VP)."
+        },
+        "points": {
+            "One Objective": 2,
+            "Two Objectives": 5
+        }
+    }
+}

@@ -1,59 +1,47 @@
-h1.text-center.text-light Admin Panel
+h1.text-center Admin Panel
 
-javascript:
-  window.addEventListener("load", function () {
-    document.getElementById("admin-form").reset(); // Forces form fields to reset on page load
-  });
-
-form#admin-form
+form#admin-panel
   .columns
     .column.col-6
-      h2 Player 1
+      h2.text-center Player 1
       label Name:
-      input type="text" name="player1_name" value=game_state[:player1][:name] autocomplete="off"
+      input.admin-input[type="text" value=game_state[:player1][:name] data-player="Player 1" data-field="name"]
       
       label Role:
-      select name="player1_role"
-        option value="Attacker" selected=(game_state[:player1][:role] == "Attacker") Attacker
-        option value="Defender" selected=(game_state[:player1][:role] == "Defender") Defender
+      select.admin-input data-player="Player 1" data-field="role"
+        option value="Attacker" selected=(game_state[:player1][:role] == 'Attacker') Attacker
+        option value="Defender" selected=(game_state[:player1][:role] == 'Defender') Defender
       
       label Army:
-      select name="player1_army"
-        - FACTIONS.each do |category, factions|
+      select.admin-input data-player="Player 1" data-field="army"
+        - FACTIONS.each do |category, faction_list|
           optgroup label=category
-            - factions.each do |faction|
-              option value=faction selected=(game_state[:player1][:army] == faction) = faction
+            - faction_list.each do |faction_name|
+              option value=faction_name selected=(game_state[:player1][:army] == faction_name) = faction_name
       
       label Detachment:
-      input type="text" name="player1_detachment" value=game_state[:player1][:detachment] autocomplete="off"
+      input.admin-input[type="text" value=game_state[:player1][:detachment] data-player="Player 1" data-field="detachment"]
 
     .column.col-6
-      h2 Player 2
+      h2.text-center Player 2
       label Name:
-      input type="text" name="player2_name" value=game_state[:player2][:name] autocomplete="off"
-      
+      input.admin-input[type="text" value=game_state[:player2][:name] data-player="Player 2" data-field="name"]
+
       label Role:
-      select name="player2_role"
-        option value="Attacker" selected=(game_state[:player2][:role] == "Attacker") Attacker
-        option value="Defender" selected=(game_state[:player2][:role] == "Defender") Defender
-      
+      select.admin-input data-player="Player 2" data-field="role"
+        option value="Attacker" selected=(game_state[:player2][:role] == 'Attacker') Attacker
+        option value="Defender" selected=(game_state[:player2][:role] == 'Defender') Defender
+
       label Army:
-      select name="player2_army"
-        - FACTIONS.each do |category, factions|
+      select.admin-input data-player="Player 2" data-field="army"
+        - FACTIONS.each do |category, faction_list|
           optgroup label=category
-            - factions.each do |faction|
-              option value=faction selected=(game_state[:player2][:army] == faction) = faction
-      
+            - faction_list.each do |faction_name|
+              option value=faction_name selected=(game_state[:player2][:army] == faction_name) = faction_name
+
       label Detachment:
-      input type="text" name="player2_detachment" value=game_state[:player2][:detachment] autocomplete="off"
+      input.admin-input[type="text" value=game_state[:player2][:detachment] data-player="Player 2" data-field="detachment"]
 
-.text-center.mt-4
-  button.btn.btn-danger#end-game End Game
-  button.btn.btn-warning#reset-game onclick="resetGame()" Reset Game
+hr
 
-// Twitch Chat Section (JChat Embed)
-.column.col-12.twitch-chat-container
-  h2.text-center.text-light Twitch Chat
-  iframe#twitch-chatbox.twitch-chat[
-    src="https://www.giambaj.it/twitch/jchat/v2/?channel=your_twitch_channel&size=3&font=5&animate=true&bots=true"
-    style="height: 100%; width: 100%;"]
+button.btn.btn-danger#reset-game Reset Game
