@@ -223,6 +223,7 @@ get '/application.css' do
   scss :application
 end
 
+set :environment, :production
 set :bind, '0.0.0.0'
 set :port, 4567
 set :views, File.dirname(__FILE__) + '/views'

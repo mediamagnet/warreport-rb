@@ -136,11 +136,13 @@ body {
 
 .main_area {
     height: 100vh;
+    background: transparent !important;
 }
 
 .main_camera {
     height: 94vh;
-}
+    background-color: rgba(0, 0, 0, 0) !important; 
+  }
 
 .supporter {
     height: 5vh;
