@@ -1,2 +1,63 @@
-h1.text-center.text-light Scoreboard
-h2.text-center.text-light Turn: #{game_state[:turn]} - #{game_state[:phase]}
+doctype html
+html
+  head
+    meta charset="utf-8"
+    title Warhammer Scorekeeper - Dashboard
+    link rel="stylesheet" href="/application.css"
+    script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"
+    script src="/js/application.js"
+
+  body
+    .container
+      // 🏠 Navigation Bar
+      nav.navbar
+        .navbar-section
+          a.btn.btn-primary href="/" Home
+          a.btn.btn-primary href="/player" Player Panel
+          a.btn.btn-primary href="/admin" Admin Panel
+          a.btn.btn-primary href="/overlay" Overlay
+        
+      // ⚔️ Battle Overview
+      .columns
+        .column.col-12.text-center
+          h1.text-light Battle Overview
+
+      .columns
+        // 🔴 Player 1 (Attacker/Defender)
+        .column.col-6[style="background: #{game_state[:player1][:role] == 'Attacker' ? 'red' : 'blue'}; padding: 20px;"]
+          h2.text-center.text-light = game_state[:player1][:name]
+          h3.text-center.text-light = game_state[:player1][:role]
+          h4.text-center.text-light = "#{game_state[:player1][:army]} - #{game_state[:player1][:detachment]}"
+          .text-center.text-light Primary VP | Secondary VP | CP
+          .columns
+            .column.col-4.text-center
+              h3.text-light = game_state[:player1][:primary]
+            .column.col-4.text-center
+              h3.text-light = game_state[:player1][:secondary]
+            .column.col-4.text-center
+              h3.text-light = game_state[:player1][:cp]
+
+        // 🔵 Player 2 (Attacker/Defender)
+        .column.col-6[style="background: #{game_state[:player2][:role] == 'Attacker' ? 'red' : 'blue'}; padding: 20px;"]
+          h2.text-center.text-light = game_state[:player2][:name]
+          h3.text-center.text-light = game_state[:player2][:role]
+          h4.text-center.text-light = "#{game_state[:player2][:army]} - #{game_state[:player2][:detachment]}"
+          .text-center.text-light Primary VP | Secondary VP | CP
+          .columns
+            .column.col-4.text-center
+              h3.text-light = game_state[:player2][:primary]
+            .column.col-4.text-center
+              h3.text-light = game_state[:player2][:secondary]
+            .column.col-4.text-center
+              h3.text-light = game_state[:player2][:cp]
+
+      // 🎮 Game State
+      .columns
+        .column.col-12.text-center
+          h2.text-light Turn: #{game_state[:turn]} - #{game_state[:phase]}
+
+      // 🏆 Winner Announcement
+      - if game_state[:winner]
+        .columns
+          .column.col-12.text-center
+            h1.text-light = "#{game_state[:winner]} Wins!"

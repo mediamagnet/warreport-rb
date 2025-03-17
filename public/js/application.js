@@ -22,7 +22,34 @@ document.addEventListener("DOMContentLoaded", function () {
             updateScore(player, field, value);
         });
     });
+
+    document.querySelectorAll(".admin-input").forEach(input => {
+        input.addEventListener("change", function () {
+            const player = this.dataset.player || null;
+            const field = this.dataset.field;
+            const value = this.value;
+
+            updateAdminField(player, field, value);
+
+            // Force selected state update for dropdowns
+            if (this.tagName === "SELECT") {
+                this.querySelectorAll("option").forEach(option => {
+                    option.removeAttribute("selected");
+                });
+                this.querySelector(`option[value="${value}"]`).setAttribute("selected", "selected");
+            }
+        });
+    });
     
+    document.getElementById("deployment-select")?.addEventListener("change", function () {
+        updateGameState(null, "deployment", this.value);
+    });
+
+    document.getElementById("mission-rule-select")?.addEventListener("change", function () {
+        updateGameState(null, "mission_rule", this.value);
+    });
+    
+
     adminInputs.forEach(input => {
         input.addEventListener("change", function () {
             updateAdminField(this.dataset.player, this.dataset.field, this.value);
@@ -40,6 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 drawMissions(player);
             });
         });
+
     
         document.querySelectorAll("[data-discard-mission]").forEach(button => {
             button.addEventListener("click", function () {
@@ -50,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
 
 function drawMissions(player) {
     fetch("/draw_missions", {
@@ -144,15 +173,27 @@ function resetGame() {
 // }
 
 function updateGameState(player, field, value) {
+    let requestData = {};
+
+    if (field === "deployment") {
+        requestData = { field: "deployment", value: value };
+    } else {
+        requestData = { player: player, [field]: value };
+    }
+
+    console.log("🛠 Sending update:", requestData); // Debugging log
+
     fetch("/update_game_state", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ player: player, [field]: value })
+        body: JSON.stringify(requestData)
     })
     .then(response => response.json())
     .then(data => {
         if (!data.success) {
             alert("Error updating game state.");
+        } else {
+            console.log("✅ Game state updated:", data);
         }
     })
     .catch(() => alert("Error updating game state."));

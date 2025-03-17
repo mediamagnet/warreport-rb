@@ -144,6 +144,7 @@ body {
     background-color: rgba(0, 0, 0, 0) !important; 
   }
 
+
 .supporter {
     height: 5vh;
     line-height: 5vh;
@@ -273,6 +274,31 @@ button {
     background-repeat: no-repeat;
     opacity: 0.3; // Adjust for visibility
 }
+
+.deployment-container-floating {
+    position: absolute;
+    bottom: 85px;  // Adjust so it hovers just above the bottom bar
+    right: 10px;
+    width: auto;
+    height: 120px; // Increase height from 96px to 120px
+    background: rgba(0, 0, 0, 0.6); // Semi-transparent dark background
+    padding: 8px; // Slightly increase padding for better spacing
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deployment-map {
+    max-width: 180px; // Increased width slightly
+    max-height: 120px; // Increased height slightly
+    object-fit: contain; // Ensures the entire image is visible within the box
+    border-radius: 5px;
+    opacity: 0.9;
+    background-color: rgba(0, 0, 0, 0.6); // Ensures a consistent background
+}
+
+
 
 
 

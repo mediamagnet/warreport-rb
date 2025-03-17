@@ -1,47 +1,71 @@
-h1.text-center Admin Panel
+h1 Admin Panel
 
-form#admin-panel
+.container
   .columns
-    .column.col-6
-      h2.text-center Player 1
-      label Name:
-      input.admin-input[type="text" value=game_state[:player1][:name] data-player="Player 1" data-field="name"]
-      
-      label Role:
-      select.admin-input data-player="Player 1" data-field="role"
-        option value="Attacker" selected=(game_state[:player1][:role] == 'Attacker') Attacker
-        option value="Defender" selected=(game_state[:player1][:role] == 'Defender') Defender
-      
-      label Army:
-      select.admin-input data-player="Player 1" data-field="army"
-        - FACTIONS.each do |category, faction_list|
-          optgroup label=category
-            - faction_list.each do |faction_name|
-              option value=faction_name selected=(game_state[:player1][:army] == faction_name) = faction_name
-      
-      label Detachment:
-      input.admin-input[type="text" value=game_state[:player1][:detachment] data-player="Player 1" data-field="detachment"]
+    .column
+      h2 Player 1
+      label for="player1_name" Name:
+      input#player1_name type="text" data-player="Player 1" data-field="name" value=game_state[:player1][:name]
 
-    .column.col-6
-      h2.text-center Player 2
-      label Name:
-      input.admin-input[type="text" value=game_state[:player2][:name] data-player="Player 2" data-field="name"]
+      label for="player1_role" Role:
+      select#player1_role data-player="Player 1" data-field="role"
+        - ["Attacker", "Defender"].each do |role|
+          - selected_attr = (game_state[:player1][:role] == role) ? "selected" : nil
+          option value=role selected=selected_attr = role
 
-      label Role:
-      select.admin-input data-player="Player 2" data-field="role"
-        option value="Attacker" selected=(game_state[:player2][:role] == 'Attacker') Attacker
-        option value="Defender" selected=(game_state[:player2][:role] == 'Defender') Defender
+      label for="player1_army" Army:
+      select#player1_army data-player="Player 1" data-field="army"
+        - FACTIONS.values.flatten.each do |faction|
+          - selected_attr = (game_state[:player1][:army] == faction) ? "selected" : nil
+          option value=faction selected=selected_attr = faction
 
-      label Army:
-      select.admin-input data-player="Player 2" data-field="army"
-        - FACTIONS.each do |category, faction_list|
-          optgroup label=category
-            - faction_list.each do |faction_name|
-              option value=faction_name selected=(game_state[:player2][:army] == faction_name) = faction_name
+      label for="player1_detachment" Detachment:
+      input#player1_detachment type="text" data-player="Player 1" data-field="detachment" value=game_state[:player1][:detachment]
 
-      label Detachment:
-      input.admin-input[type="text" value=game_state[:player2][:detachment] data-player="Player 2" data-field="detachment"]
+    .column
+      h2 Player 2
+      label for="player2_name" Name:
+      input#player2_name type="text" data-player="Player 2" data-field="name" value=game_state[:player2][:name]
 
-hr
+      label for="player2_role" Role:
+      select#player2_role data-player="Player 2" data-field="role"
+        - ["Attacker", "Defender"].each do |role|
+          - selected_attr = (game_state[:player2][:role] == role) ? "selected" : nil
+          option value=role selected=selected_attr = role
 
-button.btn.btn-danger#reset-game Reset Game
+      label for="player2_army" Army:
+      select#player2_army data-player="Player 2" data-field="army"
+        - FACTIONS.values.flatten.each do |faction|
+          - selected_attr = (game_state[:player2][:army] == faction) ? "selected" : nil
+          option value=faction selected=selected_attr = faction
+
+      label for="player2_detachment" Detachment:
+      input#player2_detachment type="text" data-player="Player 2" data-field="detachment" value=game_state[:player2][:detachment]
+
+  .divider
+
+  .columns
+    .column
+      label for="deployment-select" Deployment:
+      select#deployment-select data-field="deployment"
+        option value="" disabled selected Select a Deployment
+        - Dir.glob("public/images/deployments/*.png").each do |file|
+          - filename = File.basename(file, ".png").gsub("PN_", "")
+          - selected_attr = (game_state[:deployment] == filename) ? "selected" : nil
+          option value=filename selected=selected_attr = filename
+
+    .column
+      label for="mission-rule-select" Mission Rule:
+      select#mission-rule-select data-field="mission_rule"
+        option value="" disabled selected Select a Mission Rule
+        - mission_rules.each do |rule_name, description|
+          - selected_attr = (game_state[:mission_rule] == rule_name) ? "selected" : nil
+          option value=rule_name selected=selected_attr = rule_name
+
+  .divider
+
+  .columns
+    .column
+      button#reset-game Reset Game
+    .column
+      button#end-game End Game

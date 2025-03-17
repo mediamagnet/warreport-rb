@@ -29,9 +29,9 @@
         / Faction Symbol
         .column.col-12
           - if game_state[:player1][:role] == 'Attacker'
-            img.faction src="images/#{game_state[:player1][:army].downcase.gsub(' ', '-').gsub('_','-')}.png"
+            img.faction src="images/#{game_state[:player1][:army].downcase.gsub(' ', '-').gsub('_','-').gsub('\'','')}.png"
           - if game_state[:player2][:role] == 'Attacker'
-            img.faction src="images/#{game_state[:player2][:army].downcase.gsub(' ', '-').gsub('_','-')}.png"
+            img.faction src="images/#{game_state[:player2][:army].downcase.gsub(' ', '-').gsub('_','-').gsub('\'','')}.png"
 
       .column.col-12.camera
         | Camera
@@ -63,9 +63,9 @@
         / Faction Symbol
         .column.col-12
           - if game_state[:player1][:role] == 'Defender'
-            img.faction src="images/#{game_state[:player1][:army].downcase.gsub(' ', '_').gsub('_','-')}.png"
+            img.faction src="images/#{game_state[:player1][:army].downcase.gsub(' ', '_').gsub('_','-').gsub('\'','')}.png"
           - if game_state[:player2][:role] == 'Defender'
-            img.faction src="images/#{game_state[:player2][:army].downcase.gsub(' ', '_').gsub('_','-')}.png"
+            img.faction src="images/#{game_state[:player2][:army].downcase.gsub(' ', '_').gsub('_','-').gsub('\'','')}.png"
 
     .column.col-11.main_area
       .column.col-12.main_camera
@@ -92,4 +92,14 @@
             | Turn #{game_state[:turn]}
 
           .column.col-9.dosis-bold.text-dark
-            | show map info here
+            - if game_state[:mission_rule]
+              | Mission Rule: #{game_state[:mission_rule]}
+            - else
+              | No Mission Rule Selected
+
+
+.deployment-container-floating
+  - if game_state[:deployment] && !game_state[:deployment].empty?
+    img.deployment-map src="/images/deployments/PN_#{game_state[:deployment]}.png" alt="Deployment Map"
+
+
