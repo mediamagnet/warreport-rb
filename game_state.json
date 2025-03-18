@@ -1,25 +1,26 @@
 {
   "player1": {
-    "name": "John Warhammer",
-    "cp": 2,
+    "name": "Player 1",
+    "cp": 1,
     "primary": 0,
     "secondary": 0,
     "role": "Attacker",
-    "army": "Drukhari",
-    "detachment": "Reaper’s Wager"
+    "army": "",
+    "detachment": ""
   },
   "player2": {
-    "name": "John Helldiver",
-    "cp": 2,
+    "name": "Player 2",
+    "cp": 1,
     "primary": 0,
     "secondary": 0,
     "role": "Defender",
-    "army": "Necrons",
-    "detachment": "Hypercrypt Legion"
+    "army": "",
+    "detachment": ""
   },
   "turn": 1,
-  "phase": "Bottom",
-  "winner": null,
-  "deployment": "DawnOfWar",
-  "mission_rule": "Swift Action"
+  "phase": "Top",
+  "winner": "",
+  "deployment": "",
+  "mission_rule": "",
+  "primary_mission": ""
 }

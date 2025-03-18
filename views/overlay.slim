@@ -94,6 +94,8 @@
           .column.col-9.dosis-bold.text-dark
             - if game_state[:mission_rule]
               | Mission Rule: #{game_state[:mission_rule]}
+            - if game_state[:primary_mission]
+      |        Primary Mission: #{game_state[:primary_mission]} |
             - else
               | No Mission Rule Selected
 

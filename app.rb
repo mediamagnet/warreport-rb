@@ -34,6 +34,19 @@ MISSION_RULES = {
   "Prepared Positions" => "Players can target their BATTLELINE units with the Go to Ground and Heroic Intervention Stratagems for 0CP..."
 }
 
+PRIMARY_MISSIONS = {
+  "PURGE THE FOE" => "Each player scores 4VP if one or more enemy units were destroyed this battle round...",
+  "LINCHPIN" => "If the player whose turn it is does not control the objective marker in their deployment zone...",
+  "SCORCHED EARTH" => "What cannot be secured must be burned to ash...",
+  "UNEXPLODED ORDNANCE" => "Volatile undetonated material lies in your path...",
+  "SUPPLY DROP" => "Supplies are inbound. Secure the drop coordinates...",
+  "TERRAFORM" => "Victory here lies in dominating not only the foe, but also the landscape of the battlefield itself...",
+  "BURDEN OF TRUST" => "The strategic prizes in this region must be guarded at all costs...",
+  "TAKE AND HOLD" => "Several strategic locations have been identified in your vicinity...",
+  "THE RITUAL" => "Bitter foes clash in a race to finish a ritual to either sanctify or corrupt the battlefield..."
+}
+
+
 # Load game state or initialize it
 def load_game_state
   if File.exist?(STATE_FILE) && !File.zero?(STATE_FILE)
@@ -56,7 +69,8 @@ def initialize_default_game_state
     phase: 'Top',
     winner: nil,
     deployment: nil,
-    mission_rule: nil
+    mission_rule: nil,
+    primary_mission: nil
   }
   save_game_state(default_state)
   default_state
@@ -64,8 +78,17 @@ end
 
 
 def save_game_state(state)
+  # Replace nil values with empty strings
+  state.each do |key, value|
+    if value.is_a?(Hash)
+      value.each { |k, v| value[k] = "" if v.nil? }
+    else
+      state[key] = "" if value.nil?
+    end
+  end
   File.write(STATE_FILE, JSON.pretty_generate(state))
 end
+
 
 # Routes
 get '/' do
@@ -77,8 +100,9 @@ get '/player' do
 end
 
 get '/admin' do
-  slim :admin, locals: { game_state: load_game_state, factions: FACTIONS, mission_rules: MISSION_RULES }
+  slim :admin, locals: { game_state: load_game_state, factions: FACTIONS, mission_rules: MISSION_RULES, primary_missions: PRIMARY_MISSIONS }
 end
+
 
 post '/reset_game' do
   default_state = {
@@ -88,12 +112,14 @@ post '/reset_game' do
     phase: 'Top',
     winner: nil,
     deployment: nil,
-    mission_rule: nil  # ✅ Ensure it doesn't disappear on reset
+    mission_rule: nil,  # ✅ Ensure it resets properly
+    primary_mission: nil # ✅ Also reset primary mission
   }
   save_game_state(default_state)
   content_type :json
   { success: true }.to_json
 end
+
 
 
 post '/pass_turn' do
@@ -267,32 +293,42 @@ post '/update_game_state' do
 
   puts "🔍 Received Data: #{data}"  # Debugging log
 
-  if data["field"] == "deployment"
-    game_state[:deployment] = data["value"]
-    puts "✅ Deployment set: #{game_state[:deployment]}"
-  elsif data["field"] == "primary_mission"
-    game_state[:primary_mission] = data["value"]
-    puts "✅ Primary Mission set: #{game_state[:primary_mission]}"
-  elsif data["mission_rule"]
-    puts "🛠 Detected Mission Rule Update!"
-    game_state[:mission_rule] = data["mission_rule"]  # ✅ Force save mission rule
-    puts "✅ Mission Rule set: #{game_state[:mission_rule]}"
-  elsif data["player"]
+  if data["player"]
+    # Update player-specific fields
     player_key = data["player"] == "Player 1" ? :player1 : :player2
-    game_state[player_key][data["field"].to_sym] = data["value"]
-    puts "✅ Player Update: #{player_key} => #{data["field"]} = #{data["value"]}"
+    field = data["field"].to_sym
+
+    if game_state[player_key].key?(field)
+      game_state[player_key][field] = data["value"]
+      puts "✅ Player Update: #{player_key} => #{field} = #{data["value"]}"
+    else
+      puts "❌ Invalid Player Field: #{field}"
+    end
+  elsif data["field"] && data["value"]
+    # Update global game state fields (ensure they exist)
+    allowed_global_fields = ["deployment", "primary_mission", "mission_rule"]
+    if allowed_global_fields.include?(data["field"])
+      game_state[data["field"].to_sym] = data["value"]
+      puts "✅ Updated #{data["field"]}: #{game_state[data["field"].to_sym]}"
+    else
+      puts "❌ Invalid Global Field: #{data["field"]}"
+    end
   else
-    puts "❌ No valid field found in request! Data Structure: #{data}"
+    puts "❌ No valid field found in request!"
   end
+
+  # Ensure all game state fields exist
+  game_state[:deployment] ||= ""
+  game_state[:primary_mission] ||= ""
+  game_state[:mission_rule] ||= ""
 
   save_game_state(game_state)
 
-  puts "✅ Final Game State: #{game_state}"  # Debug log
+  puts "✅ Final Game State: #{game_state}"  # Debugging log
 
   content_type :json
   { success: true, game_state: game_state }.to_json
 end
-
 
 get '/overlay' do
   slim :overlay, locals: { game_state: load_game_state }

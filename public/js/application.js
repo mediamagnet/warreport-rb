@@ -23,6 +23,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    document.getElementById("primary-mission-select")?.addEventListener("change", function () {
+        updateGameState(null, "primary_mission", this.value);
+    });
+
     document.querySelectorAll(".admin-input").forEach(input => {
         input.addEventListener("change", function () {
             const player = this.dataset.player || null;
@@ -33,11 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Force selected state update for dropdowns
             if (this.tagName === "SELECT") {
-                this.querySelectorAll("option").forEach(option => {
-                    option.removeAttribute("selected");
-                });
-                this.querySelector(`option[value="${value}"]`).setAttribute("selected", "selected");
-            }
+                this.value = value;  // ✅ Proper way to persist dropdown selection
+            }            
         });
     });
     
@@ -60,23 +61,6 @@ document.addEventListener("DOMContentLoaded", function () {
         nextTurnButton.addEventListener("click", passTurn);
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll("[data-draw-missions]").forEach(button => {
-            button.addEventListener("click", function () {
-                const player = this.getAttribute("data-player");
-                drawMissions(player);
-            });
-        });
-
-    
-        document.querySelectorAll("[data-discard-mission]").forEach(button => {
-            button.addEventListener("click", function () {
-                const missionSlot = this.closest(".mission-card").getAttribute("data-slot");
-                const player = this.closest(".mission-card").getAttribute("data-player");
-                discardMission(player, missionSlot);
-            });
-        });
-    });
 });
 
 
@@ -175,8 +159,8 @@ function resetGame() {
 function updateGameState(player, field, value) {
     let requestData = {};
 
-    if (field === "deployment") {
-        requestData = { field: "deployment", value: value };
+    if (field === "deployment" || field === "mission_rule" || field === "primary_mission") {
+        requestData = { field: field, value: value };
     } else {
         requestData = { player: player, [field]: value };
     }
@@ -198,6 +182,7 @@ function updateGameState(player, field, value) {
     })
     .catch(() => alert("Error updating game state."));
 }
+
 
 function passTurn() {
     fetch("/pass_turn", { method: "POST" })
