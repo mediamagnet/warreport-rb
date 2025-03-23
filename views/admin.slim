@@ -57,3 +57,10 @@ form
   h2 Game Control
   button#reset-game Reset Game
   button#end-game End Game
+
+  h3 Change Turn Manually
+  form
+    label for="turn_input" Set Turn:
+    input#turn_input.admin-input type="number" min="1" value=game_state[:turn]
+    button.btn.btn-primary#update-turn Update Turn
+

@@ -16,6 +16,28 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  document.getElementById("update-turn")?.addEventListener("click", e => {
+    e.preventDefault();
+    const newTurn = document.getElementById("turn_input").value;
+  
+    fetch("/update_turn", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ turn: newTurn })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        console.log("Turn updated successfully.");
+      } else {
+        console.error("Failed to update turn.");
+      }
+    })
+    .catch(error => console.error("Error updating turn:", error));
+  });
   
   const passTurnBtn = document.getElementById("pass-turn");
   if (passTurnBtn) {

@@ -1,33 +1,29 @@
 {
   "player1": {
-    "name": "John Warhammer",
-    "cp": 5,
-    "primary": 1,
-    "secondary": 0,
+    "name": "Woody",
+    "cp": 1,
+    "primary": 30,
+    "secondary": 15,
     "role": "Attacker",
-    "army": "Necrons",
-    "detachment": "Hypercrypt Legion",
-    "missions": [
-
-    ]
+    "army": "Chaos Space Marines",
+    "detachment": "Soulforge Warpact",
+    "missions": []
   },
   "player2": {
-    "name": "John Helldiver",
-    "cp": 5,
-    "primary": 0,
-    "secondary": 0,
+    "name": "Phill",
+    "cp": 2,
+    "primary": 15,
+    "secondary": 10,
     "role": "Defender",
     "army": "T'au Empire",
-    "detachment": "Retaliation Cadre",
-    "missions": [
-
-    ]
+    "detachment": "Kauyon",
+    "missions": []
   },
-  "turn": 6,
+  "turn": 4,
   "phase": "Top",
   "winner": "",
   "game_over": false,
-  "deployment": "CrucibleOfBattle",
-  "mission_rule": "Inspired Leadership",
-  "primary_mission": "SUPPLY DROP"
+  "deployment": "TippingPoint",
+  "mission_rule": "Raise Banners",
+  "primary_mission": "TAKE AND HOLD"
 }

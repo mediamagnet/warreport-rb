@@ -37,19 +37,22 @@ MISSION_RULES = {
 }
 
 PRIMARY_MISSIONS = {
-  "PURGE THE FOE" => "Each player scores 4VP if one or more enemy units were destroyed this battle round...",
-  "LINCHPIN" => "If the player whose turn it is does not control the objective marker in their deployment zone...",
-  "SCORCHED EARTH" => "What cannot be secured must be burned to ash...",
-  "UNEXPLODED ORDNANCE" => "Volatile undetonated material lies in your path...",
-  "SUPPLY DROP" => "Supplies are inbound. Secure the drop coordinates...",
-  "TERRAFORM" => "Victory here lies in dominating not only the foe, but also the landscape of the battlefield itself...",
-  "BURDEN OF TRUST" => "The strategic prizes in this region must be guarded at all costs...",
-  "TAKE AND HOLD" => "Several strategic locations have been identified in your vicinity...",
-  "THE RITUAL" => "Bitter foes clash in a race to finish a ritual to either sanctify or corrupt the battlefield..."
+  "Purge The Foe" => "Each player scores 4VP if one or more enemy units were destroyed this battle round...",
+  "Linchpin" => "If the player whose turn it is does not control the objective marker in their deployment zone...",
+  "Scorched Earth" => "What cannot be secured must be burned to ash...",
+  "Unexploded Ordnance" => "Volatile undetonated material lies in your path...",
+  "Supply Drop" => "Supplies are inbound. Secure the drop coordinates...",
+  "Terraform" => "Victory here lies in dominating not only the foe, but also the landscape of the battlefield itself...",
+  "Burden of Trust" => "The strategic prizes in this region must be guarded at all costs...",
+  "Take and Hold" => "Several strategic locations have been identified in your vicinity...",
+  "The Ritual" => "Bitter foes clash in a race to finish a ritual to either sanctify or corrupt the battlefield..."
 }
 
 $connections = []
 
+# TODO: Screen wake lock with player view
+# TODO: Make sure turn count works.
+# TODO: +1 -1 +5 -5 score buttons
 
 # WebSocket endpoint
 get '/ws' do
@@ -137,15 +140,27 @@ def initialize_default_game_state
 end
 
 def save_game_state(state)
-  state.each do |key, value|
+  # Deep clone to avoid mutating the live state hash
+  sanitized = Marshal.load(Marshal.dump(state))
+
+  sanitized.each do |key, value|
     if value.is_a?(Hash)
-      value.each { |k, v| value[k] = "" if v.nil? }
+      value.each do |k, v|
+        # Default expected types
+        if [:cp, :primary, :secondary].include?(k)
+          value[k] = v.to_i rescue 0
+        elsif k == :missions && !v.is_a?(Array)
+          value[k] = []
+        else
+          value[k] = v.nil? ? "" : v
+        end
+      end
     else
-      state[key] = "" if value.nil?
+      sanitized[key] = value.nil? ? "" : value
     end
   end
 
-  json_data = JSON.pretty_generate(state)
+  json_data = JSON.pretty_generate(sanitized)
 
   File.open(STATE_FILE, 'w') do |file|
     file.flock(File::LOCK_EX)
@@ -153,9 +168,9 @@ def save_game_state(state)
     file.flock(File::LOCK_UN)
   end
 
-  # Also write to a backup
   File.write("#{STATE_FILE}.bak", json_data)
 end
+
 
 # Routes
 get '/' do
@@ -205,41 +220,47 @@ end
 post '/pass_turn' do
   state = load_game_state
 
-  if state[:turn] <= 5
-    if state[:phase] == 'Top'
-      state[:phase] = 'Bottom'
-    else
-      state[:phase] = 'Top'
-      state[:turn] += 1
-      # Add CP only at the top of a turn
-      if state[:turn] <= 5
-        state[:player1][:cp] += 1
-        state[:player2][:cp] += 1
-      end
-    end
+  # Advance phase
+  if state[:phase] == 'Top'
+    state[:phase] = 'Bottom'
+
+    # Add CP to both players at start of Bottom (new rule per half-turn)
+    state[:player1][:cp] += 1
+    state[:player2][:cp] += 1
+  else
+    state[:phase] = 'Top'
+    state[:turn] += 1
+
+    # Add CP again at start of Top
+    state[:player1][:cp] += 1
+    state[:player2][:cp] += 1
   end
 
-  # ✅ Only declare winner at end of Turn 5 Bottom phase or beyond
-  if (state[:turn] > 5 || (state[:turn] == 5 && state[:phase] == "Bottom")) && !state[:winner]
-    p1 = state[:player1][:primary] + state[:player1][:secondary]
-    p2 = state[:player2][:primary] + state[:player2][:secondary]
+  # Determine winner if turn > 5 and we haven’t already
+  if state[:turn] > 5 && !state[:winner]
+    p1_total = state[:player1][:primary] + state[:player1][:secondary]
+    p2_total = state[:player2][:primary] + state[:player2][:secondary]
 
-    state[:winner] = if p1 > p2
-      state[:player1][:name]
-    elsif p2 > p1
-      state[:player2][:name]
-    else
-      "Draw"
-    end
+    state[:winner] = if p1_total > p2_total
+                       state[:player1][:name]
+                     elsif p2_total > p1_total
+                       state[:player2][:name]
+                     else
+                       "Draw"
+                     end
 
     state[:game_over] = true
   end
-
+  puts "🌀 State before saving:"
+  puts state  
   save_game_state(state)
+  puts "✅ Saved state successfully"
   broadcast_state(state)
+
   content_type :json
   { success: true, game_state: state }.to_json
 end
+
 
 post '/update_score' do
   state = load_game_state
@@ -313,6 +334,23 @@ post '/draw_missions' do
   broadcast_state(state)
   content_type :json
   { success: true, missions: draw.map { |m| { name: m, description: cards[m] } } }.to_json
+end
+
+post '/update_turn' do
+  state = load_game_state
+  data = JSON.parse(request.body.read) rescue {}
+  new_turn = data["turn"].to_i
+
+  if new_turn > 0
+    state[:turn] = new_turn
+    save_game_state(state)
+    broadcast_state(state)
+    content_type :json
+    { success: true, game_state: state }.to_json
+  else
+    content_type :json
+    { success: false, message: "Invalid turn number." }.to_json
+  end
 end
 
 post '/discard_mission' do
