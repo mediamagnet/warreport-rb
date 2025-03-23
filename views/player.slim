@@ -1,12 +1,12 @@
 .text-center
-  button.btn.btn-lg.btn-success#next-turn Pass Turn
+  button#pass-turn.btn.btn-lg.btn-success Pass Turn
 
 .columns
   .column.col-6.player-panel[style="background: linear-gradient(to bottom, #{game_state[:player1][:role] == 'Attacker' ? 'rgba(255, 0, 0, 0.8)' : 'rgba(0, 0, 255, 0.8)'}, rgba(0,0,0,0.8)), url('/images/#{game_state[:player1][:army].downcase.gsub(' ', '-').gsub('\'','')}.png'); background-size: contain; background-position: center; background-repeat: no-repeat;"]
     h2.text-center Player 1
     h3.text-center = game_state[:player1][:role]
     h4.text-center = "#{game_state[:player1][:army]} - #{game_state[:player1][:detachment]}"
-    
+        
     .text-center Primary VP | Secondary VP
     .columns
       .column.col-6.text-center

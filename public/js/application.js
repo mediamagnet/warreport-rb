@@ -1,67 +1,99 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const resetButton = document.getElementById("reset-game");
-    const nextTurnButton = document.getElementById("next-turn");
-    const adminInputs = document.querySelectorAll(".admin-input");
-    
-    // fetchGameState();
-    fetch("/secondary_missions.json")
-    .then(response => response.json())
+document.addEventListener("DOMContentLoaded", () => {
+  const inputs = document.querySelectorAll('.admin-input');
+  document.getElementById("pass-turn")?.addEventListener("click", e => {
+    e.preventDefault();
+    passTurn(); // ✅ Call your defined function
+  });
+
+  // Handle Score Buttons
+  document.querySelectorAll("[data-update-score]").forEach(button => {
+    button.addEventListener("click", () => {
+      const player = button.dataset.player;
+      const field = button.dataset.field;
+      const value = parseInt(button.dataset.value, 10);
+      if (player && field) {
+        updateScore(player, field, value);
+      }
+    });
+  });
+  
+  const passTurnBtn = document.getElementById("pass-turn");
+  if (passTurnBtn) {
+    passTurnBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      passTurn();
+    });
+  }
+
+    // Mission Draw Buttons
+    const drawP1 = document.getElementById("draw-mission-p1");
+    const drawP2 = document.getElementById("draw-mission-p2");
+  
+    if (drawP1) {
+      drawP1.addEventListener("click", () => drawMissions("Player 1"));
+    }
+  
+    if (drawP2) {
+      drawP2.addEventListener("click", () => drawMissions("Player 2"));
+    }
+  
+  // Debounce function
+  const debounce = (fn, delay = 300) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+  };
+  
+  const sendUpdate = debounce((input) => {
+    const field = input.dataset.field;
+    const player = input.dataset.player;
+    const value = input.value;
+  
+    const payload = player
+      ? { player, field, value }
+      : { field, value };
+  
+    fetch('/update_admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(res => {
+      if (!res.ok) console.error("Failed to update", field);
+    });
+  });
+  
+  inputs.forEach(input => {
+    input.addEventListener('change', () => sendUpdate(input));
+  });
+
+  document.getElementById("pass-turn")?.addEventListener("click", e => {
+  e.preventDefault();
+  fetch("/pass_turn", { method: "POST" })
+    .then(res => res.json())
     .then(data => {
-        populateMissionDropdowns(data.cards);
-    })
-    .catch(error => console.error("Error loading mission data:", error));
-
-    if (resetButton) {
-        resetButton.addEventListener("click", resetGame);
-    }
-    document.querySelectorAll("[data-update-score]").forEach(button => {
-        button.addEventListener("click", function () {
-            const player = this.getAttribute("data-player");
-            const field = this.getAttribute("data-field");
-            const value = parseInt(this.getAttribute("data-value"));
-            updateScore(player, field, value);
-        });
+      if (data.success) {
+        console.log("✅ Turn advanced");
+      } else {
+        console.error("❌ Failed to pass turn");
+      }
     });
-
-    document.getElementById("primary-mission-select")?.addEventListener("change", function () {
-        updateGameState(null, "primary_mission", this.value);
-    });
-
-    document.querySelectorAll(".admin-input").forEach(input => {
-        input.addEventListener("change", function () {
-            const player = this.dataset.player || null;
-            const field = this.dataset.field;
-            const value = this.value;
-
-            updateAdminField(player, field, value);
-
-            // Force selected state update for dropdowns
-            if (this.tagName === "SELECT") {
-                this.value = value;  // ✅ Proper way to persist dropdown selection
-            }            
-        });
-    });
-    
-    document.getElementById("deployment-select")?.addEventListener("change", function () {
-        updateGameState(null, "deployment", this.value);
-    });
-
-    document.getElementById("mission-rule-select")?.addEventListener("change", function () {
-        updateGameState(null, "mission_rule", this.value);
-    });
-    
-
-    adminInputs.forEach(input => {
-        input.addEventListener("change", function () {
-            updateAdminField(this.dataset.player, this.dataset.field, this.value);
-        });
-    });
-
-    if (nextTurnButton) {
-        nextTurnButton.addEventListener("click", passTurn);
-    }
-
 });
+  
+  // Reset Game
+  document.getElementById("reset-game")?.addEventListener("click", e => {
+    e.preventDefault();
+    fetch("/reset_game", { method: "POST" });
+  });
+  
+  // End Game
+  document.getElementById("end-game")?.addEventListener("click", e => {
+    e.preventDefault();
+    fetch("/end_game", { method: "POST" });
+  });
+});
+
 
 
 function drawMissions(player) {
@@ -301,3 +333,73 @@ function updateMission(select) {
             });
         });
 }
+
+// === WebSocket DOM Updates for Overlay ===
+if (window.location.pathname === "/overlay") {
+    const socket = new WebSocket(`ws://${location.host}/ws`);
+  
+    socket.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+  
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+  
+      const setImage = (id, src) => {
+        const el = document.getElementById(id);
+        if (el) el.src = src;
+      };
+  
+      const p1 = data.player1;
+      const p2 = data.player2;
+      const isP1Attacker = p1.role === "Attacker";
+  
+      const attacker = isP1Attacker ? p1 : p2;
+      const defender = isP1Attacker ? p2 : p1;
+  
+      // Text updates
+      setText("attacker_name", attacker.name);
+      setText("attacker_army", attacker.army);
+      setText("attacker_detachment", attacker.detachment);
+      setText("attacker_vp", attacker.primary + attacker.secondary);
+      setText("attacker_cp", attacker.cp);
+  
+      setText("defender_name", defender.name);
+      setText("defender_army", defender.army);
+      setText("defender_detachment", defender.detachment);
+      setText("defender_vp", defender.primary + defender.secondary);
+      setText("defender_cp", defender.cp);
+  
+      setText("turn_number", `Turn ${data.turn}`);
+      setText("mission_rule", `Mission Rule: ${data.mission_rule || "None"}`);
+      setText("primary_mission", `Primary Mission: ${data.primary_mission || "None"}`);
+  
+      // Icons
+      const attackerArmySlug = attacker.army?.toLowerCase().replace(/[\s_']/g, "-");
+      const defenderArmySlug = defender.army?.toLowerCase().replace(/[\s_']/g, "-");
+      setImage("attacker_icon", `/images/${attackerArmySlug}.png`);
+      setImage("defender_icon", `/images/${defenderArmySlug}.png`);
+  
+      // Deployment map
+      if (data.deployment) {
+        setImage("deployment_map", `/images/deployments/PN_${data.deployment}.png`);
+      }
+      const passTurnButton = document.getElementById("pass-turn");
+ 
+      // Winner
+      const winnerOverlay = document.querySelector(".winner-overlay");
+      if (winnerOverlay) {
+        winnerOverlay.innerHTML = data.winner
+          ? `<h1 class="text-light large centered">${data.winner} Wins!</h1>`
+          : "";
+      }
+    };
+  }
+  if (data.game_over && data.winner) {
+    document.getElementById("winner-overlay").style.display = "block";
+    document.querySelector("#winner-overlay h1").textContent = `${data.winner} Wins!`;
+  } else {
+    document.getElementById("winner-overlay").style.display = "none";
+  }
+    

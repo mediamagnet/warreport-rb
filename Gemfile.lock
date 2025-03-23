@@ -2,6 +2,10 @@ GEM
   remote: https://rubygems.org/
   specs:
     base64 (0.2.0)
+    eventmachine (1.2.7)
+    faye-websocket (0.11.3)
+      eventmachine (>= 0.12.0)
+      websocket-driver (>= 0.5.1)
     ffi (1.17.1-x64-mingw-ucrt)
     ffi (1.17.1-x86_64-linux-gnu)
     logger (1.6.6)
@@ -44,12 +48,18 @@ GEM
       tilt (>= 2.1.0)
     temple (0.10.3)
     tilt (2.6.0)
+    websocket-driver (0.7.7)
+      base64
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.5)
 
 PLATFORMS
   x64-mingw-ucrt
   x86_64-linux
 
 DEPENDENCIES
+  eventmachine
+  faye-websocket (~> 0.11.3)
   puma (~> 6.6)
   rack (~> 3.1)
   rackup (~> 2.2)
@@ -59,4 +69,4 @@ DEPENDENCIES
   slim (~> 5.2)
 
 BUNDLED WITH
-   2.5.22
+   2.6.5

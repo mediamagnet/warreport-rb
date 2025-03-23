@@ -298,7 +298,20 @@ button {
     background-color: rgba(0, 0, 0, 0.6); // Ensures a consistent background
 }
 
+.flash-update {
+    animation: flash 0.4s ease-in-out;
+}
+  
+@keyframes flash {
+  0% { background-color: yellow; }
+  100% { background-color: inherit; }
+}
 
 
-
-
+.game-over-banner {
+  background: #800; /* dark red */
+  padding: 1rem;
+  border: 2px solid #f00;
+  margin-bottom: 1rem;
+  text-align: center;
+}

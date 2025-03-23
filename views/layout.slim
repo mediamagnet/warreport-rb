@@ -14,7 +14,60 @@ html
     link type="text/css" rel="stylesheet" href="application.css"
   body.text-light.p-4
     == yield
-    script
-      | document.addEventListener("DOMContentLoaded", function() {
-      |   feather.replace();
-      | });
+script
+  |
+    document.addEventListener("DOMContentLoaded", function () {
+      feather.replace();
+
+      const ws = new WebSocket("ws://" + window.location.host + "/ws");
+
+      ws.onopen = function () {
+        console.log("🟢 WebSocket connected");
+      };
+
+      ws.onmessage = function (event) {
+        console.log("📨 Update received:", event.data);
+
+        // Reload the page on update
+        window.location.reload();
+      };
+
+      ws.onerror = function (error) {
+        console.error("❌ WebSocket error:", error);
+      };
+
+      ws.onclose = function () {
+        console.log("🔴 WebSocket disconnected");
+      };
+    });
+
+script
+  | document.addEventListener("DOMContentLoaded", () => {
+  |   const socket = new WebSocket(`ws://${location.host}/ws`);
+  |   socket.onmessage = event => {
+  |     const data = JSON.parse(event.data);
+  |     updateDOM(data);
+  |   };
+  |
+  |   function updateDOM(state) {
+  |     // Update Turn
+  |     document.getElementById("turn-count")?.textContent = `Turn ${state.turn}`;
+  |
+  |     // Update Mission Rule
+  |     document.getElementById("mission-rule")?.textContent = state.mission_rule || "No Mission Rule Selected";
+  |
+  |     // Update Player Fields
+  |     ["player1", "player2"].forEach(playerKey => {
+  |       const p = state[playerKey];
+  |       if (!p) return;
+  |       for (const field of ["name", "army", "detachment", "cp", "primary", "secondary"]) {
+  |         const el = document.getElementById(`${playerKey}-${field}`);
+  |         if (el) {
+  |           el.textContent = field === "primary" || field === "secondary"
+  |             ? (parseInt(p.primary || 0) + parseInt(p.secondary || 0))
+  |             : p[field];
+  |         }
+  |       }
+  |     });
+  |   }
+  | });

@@ -13,3 +13,6 @@ gem "rack", "~> 3.1"
 gem "rackup", "~> 2.2"
 
 gem "sassc", "~> 2.4"
+
+gem "faye-websocket", "~> 0.11.3"
+gem "eventmachine", require: false
